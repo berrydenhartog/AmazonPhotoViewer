@@ -1,14 +1,14 @@
 <template>
   <div class="home">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li v-for="(title,index) in titleStack" :key="index">
-          {{ title }}
-        </li>
-      </ul>
+    <nav class="breadcrumb">
+      <div class="buttons">
+        <b-button type="is-light" @click="listalbum2" v-for="(title,index) in titleStack" :key="index">
+        {{ title }}
+        </b-button>
+      </div>
     </nav>
     <div class="buttons">
-      <b-button @click="listalbum" type="is-light" v-for="(title,index) in albums" :key="index">
+      <b-button type="is-light"  @click="listalbum" v-for="(title,index) in albums" :key="index">
         {{ title.Prefix }}
       </b-button>
     </div>
@@ -69,6 +69,12 @@ export default {
         alert(err);
       } else {
         mythis.albums = data.CommonPrefixes;
+        for (var i = 1; i < data.Contents.length; i++) {
+          var myurl = s3.getSignedUrl('getObject', {
+            Key: data.Contents[i].Key
+          });
+          mythis.images.push({'url': myurl, 'title':data.Contents[i].Key, 'size':data.Contents[i].Size});
+        }
       }
     });
   },
@@ -78,11 +84,28 @@ export default {
     }
   },
   methods: {
+    listalbum2: function (event) {
+      console.log(event.target.innerText);
+      console.log(this.titleStack);
+    },
     listalbum: function (event) {
       // `event` is the native DOM event
-      this.path = event.target.innerText;
-      this.titleStack = [event.target.innerText];
-      var mythis = this
+      var mythis = this;
+      console.log("titleStack start "+this.titleStack)
+      this.titleStack.shift()
+      console.log("titleStack shift "+this.titleStack)
+      var searchpath = ""
+      if (this.titleStack.length < 1) {
+        var searchpath = event.target.innerText;
+      } else {
+        var searchpath = this.titleStack.join("/")+"/"+event.target.innerText;
+      }
+      console.log("searchpath"+searchpath)
+
+      this.titleStack = ["/"];
+      this.titleStack = this.titleStack.concat(searchpath.split('/'));
+      this.titleStack.pop()
+      console.log("titleStack end "+this.titleStack)
 
       this.images = []
       var s3 = new AWS.S3({
@@ -90,11 +113,19 @@ export default {
         params: {Bucket: "fotoschantal"}
       });
 
-      // get files
-      s3.listObjects({Prefix: event.target.innerText}, function(err, data) {
+          // get folders
+      s3.listObjects({Delimiter: "/",Prefix: searchpath}, function(err, data) {
         if (err) {
           alert(err);
         } else {
+          // get album and strip prefix
+          mythis.albums = data.CommonPrefixes;
+
+          for (var i = 0; i < mythis.albums.length; i++) {
+            mythis.albums[i].Prefix = mythis.albums[i].Prefix.replace(data.Prefix,'')
+          }
+
+          // get images
           for (var i = 1; i < data.Contents.length; i++) {
             var myurl = s3.getSignedUrl('getObject', {
               Key: data.Contents[i].Key
