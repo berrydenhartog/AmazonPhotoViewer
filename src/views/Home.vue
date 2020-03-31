@@ -60,7 +60,7 @@ export default {
 
     var s3 = new AWS.S3({
       apiVersion: '2006-03-01',
-      params: {Bucket: 'fotobackupsberry-resized'}
+      params: {Bucket: 'fotoschantal-resized'}
     });
     
     // get folders
@@ -89,7 +89,7 @@ export default {
 
       var s3 = new AWS.S3({
         apiVersion: '2006-03-01',
-        params: {Bucket: "fotobackupsberry"}
+        params: {Bucket: "fotoschantal"}
       });
       var myurl = s3.getSignedUrl('getObject', {
         Key: event.target.alt
@@ -122,7 +122,7 @@ export default {
       this.images = []
       var s3 = new AWS.S3({
         apiVersion: '2006-03-01',
-        params: {Bucket: "fotobackupsberry-resized"}
+        params: {Bucket: "fotoschantal-resized"}
       });
 
           // get folders
@@ -165,7 +165,7 @@ export default {
       this.images = []
       var s3 = new AWS.S3({
         apiVersion: '2006-03-01',
-        params: {Bucket: "fotobackupsberry-resized"}
+        params: {Bucket: "fotoschantal-resized"}
       });
 
           // get folders
