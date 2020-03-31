@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <nav class="navbar" role="navigation" aria-label="main navigation">
+    <nav class="navbar" role="navigation">
       <div class="navbar-brand">
         <div class="navbar-item">
           PhotoViewer
         </div>
       </div>
     
-      <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item">
+          <a class="navbar-item" href="/">
             Home
           </a>
         </div>
@@ -17,7 +17,7 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <a class="button is-light">
+              <a class="button is-light" href="/">
                 Log out
               </a>
             </div>
@@ -37,7 +37,6 @@
         </p>
       </div>
     </footer>
-
   </div>
 </template>
 

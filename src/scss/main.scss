@@ -1,0 +1,59 @@
+/* We'll need some initial vars to use here */
+@import "~bulma/sass/utilities/initial-variables";
+
+/* Base: Size  */
+$size-base: 1rem;
+$default-padding: $size-base * 1.5;
+
+/* Default font */
+$family-sans-serif: "Nunito", sans-serif;
+
+/* Base color */
+$base-color: #2e323a;
+$base-color-light: rgba(24,28,33,0.06);
+
+/* General overrides */
+$primary: $turquoise;
+$body-background-color: #f8f8f8;
+$link: $blue;
+$link-visited: $purple;
+$light-border: 1px solid $base-color-light;
+$hr-height: 1px;
+
+/* Hero Bar: specifics */
+$hero-bar-background: $white;
+
+/* load bulm with current setting */
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
+
+
+
+#app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+  }
+
+.Home a {
+  font-weight: bold;
+  color: #f5f5f5;
+}
+
+.home {
+    padding-top: $default-padding;
+    padding-bottom: $default-padding;
+}
+
+
+section.hero.is-hero-bar {
+    background-color: $hero-bar-background;
+    border-bottom: $light-border;
+  
+    .hero-body {
+      padding: $default-padding;
+
+    }
+}
