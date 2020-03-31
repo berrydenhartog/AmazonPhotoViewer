@@ -14,9 +14,9 @@
     </div>
     <div class="section">
         <div v-for="images in chunkedImages"  v-bind:key="images.index" class="columns">
-          <div v-for="image in images"  v-bind:key="image.index" class="column is-2">
+          <div v-for="image in images" v-bind:key="image.index" class="column is-2">
             <figure class="image">
-              <img v-bind:src="image.url">
+              <img @click="loadFull" v-bind:src="image.url" :alt="image.title">
             </figure> 
           </div>   
         </div>   
@@ -60,7 +60,7 @@ export default {
 
     var s3 = new AWS.S3({
       apiVersion: '2006-03-01',
-      params: {Bucket: 'fotoschantal'}
+      params: {Bucket: 'fotobackupsberry-resized'}
     });
     
     // get folders
@@ -84,33 +84,45 @@ export default {
     }
   },
   methods: {
-    listalbum2: function (event) {
-      console.log(event.target.innerText);
-      console.log(this.titleStack);
+    loadFull: function (event) {
+      console.log(event.target.alt)
+
+      var s3 = new AWS.S3({
+        apiVersion: '2006-03-01',
+        params: {Bucket: "fotobackupsberry"}
+      });
+      var myurl = s3.getSignedUrl('getObject', {
+        Key: event.target.alt
+      });
+      window.open(myurl, '_blank');
     },
-    listalbum: function (event) {
-      // `event` is the native DOM event
+    listalbum2: function (event) {
       var mythis = this;
-      console.log("titleStack start "+this.titleStack)
       this.titleStack.shift()
-      console.log("titleStack shift "+this.titleStack)
       var searchpath = ""
-      if (this.titleStack.length < 1) {
-        var searchpath = event.target.innerText;
-      } else {
-        var searchpath = this.titleStack.join("/")+"/"+event.target.innerText;
+      if (event.target.innerText !== "/") {
+        for (var i = 0; i < this.titleStack.length; i++) { 
+          if ( i == 0 ) {
+            searchpath = this.titleStack[i]
+          } else {
+            searchpath = searchpath+"/"+this.titleStack[i];
+          }
+          if (this.titleStack[i] == event.target.innerText) {
+            searchpath = searchpath + "/"
+            break;
+          }
+        }
       }
-      console.log("searchpath"+searchpath)
+ 
 
       this.titleStack = ["/"];
       this.titleStack = this.titleStack.concat(searchpath.split('/'));
       this.titleStack.pop()
-      console.log("titleStack end "+this.titleStack)
 
       this.images = []
       var s3 = new AWS.S3({
         apiVersion: '2006-03-01',
-        params: {Bucket: "fotoschantal"}
+        params: {Bucket: "fotobackupsberry-resized"}
       });
 
           // get folders
@@ -126,7 +138,50 @@ export default {
           }
 
           // get images
-          for (var i = 1; i < data.Contents.length; i++) {
+          for (var i = 0; i < data.Contents.length; i++) {
+            var myurl = s3.getSignedUrl('getObject', {
+              Key: data.Contents[i].Key
+            });
+            mythis.images.push({'url': myurl, 'title':data.Contents[i].Key, 'size':data.Contents[i].Size});
+          }
+        }
+      });
+    },
+    listalbum: function (event) {
+      // `event` is the native DOM event
+      var mythis = this;
+      this.titleStack.shift()
+      var searchpath = ""
+      if (this.titleStack.length < 1) {
+        var searchpath = event.target.innerText;
+      } else {
+        var searchpath = this.titleStack.join("/")+"/"+event.target.innerText;
+      }
+
+      this.titleStack = ["/"];
+      this.titleStack = this.titleStack.concat(searchpath.split('/'));
+      this.titleStack.pop()
+
+      this.images = []
+      var s3 = new AWS.S3({
+        apiVersion: '2006-03-01',
+        params: {Bucket: "fotobackupsberry-resized"}
+      });
+
+          // get folders
+      s3.listObjects({Delimiter: "/",Prefix: searchpath}, function(err, data) {
+        if (err) {
+          alert(err);
+        } else {
+          // get album and strip prefix
+          mythis.albums = data.CommonPrefixes;
+
+          for (var i = 0; i < mythis.albums.length; i++) {
+            mythis.albums[i].Prefix = mythis.albums[i].Prefix.replace(data.Prefix,'')
+          }
+
+          // get images
+          for (var i = 0; i < data.Contents.length; i++) {
             var myurl = s3.getSignedUrl('getObject', {
               Key: data.Contents[i].Key
             });

@@ -9,9 +9,6 @@
     
       <div class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="/">
-            Home
-          </a>
         </div>
     
         <div class="navbar-end">
