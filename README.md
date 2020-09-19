@@ -1,4 +1,4 @@
 # photoviewer
 
 ## Project setup
-sipmle project to view all images from s3 bucket
+simple project to view all images from s3 bucket. is uses aws cognito to authenticate before viewing images. You can then download the images using secure links
